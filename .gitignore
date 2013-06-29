@@ -1,0 +1,26 @@
+*.class
+
+# Package Files #
+
+*.war
+*.ear
+
+# idea
+.idea/*
+*.iml
+*.dll
+logs/**
+.settings/*
+.classpath
+.project
+*.ppt
+*~*.docx
+output/**
+
+target/*
+
+*.classpath
+*.project
+*.settings/**
+
+dll/**
