@@ -23,11 +23,11 @@ public class NeuronComparator implements Comparator<Neuron> {
         if(n1.getWeights().length!=n2.getWeights().length) {
             return -1;
         } else {
-            double resual = 0;
-            for(int i=0; i<weights1.length; i++) {
-                resual += Math.pow(n1.getWeights()[i]-n2.getWeights()[i],2);
+            double result = 0;
+            for(int i=0; i<n1.getWeights().length; i++) {
+                result += Math.pow(n1.getWeights()[i]-n2.getWeights()[i],2);
             }
-            return Math.sqrt(resual);
+            return Math.sqrt(result);
         }
     }
 

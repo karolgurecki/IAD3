@@ -46,16 +46,16 @@ public class NeuralGas extends SOM{
         initNeurons(learnPattern.get(0).getWeights().length);
         // neural gas algorithm
         for(int i=0; i<eras; i++) {
-            lambda = lambdaMax * Math.pow(lambdaMin/lambdaMax,(double)i/epochsCounter);
-            for(int j=0; j< learnPattern.size(); j++) {
+            lambda = lambdaMax * Math.pow(lambdaMin/lambdaMax,(double)i/eras);
+            for (Neuron aLearnPattern : learnPattern) {
                 //sorting neurons
-                Collections.sort(neurons, new NeuronComparator(learnPattern.get(j)));
+                Collections.sort(neurons, new NeuronComparator(aLearnPattern));
                 //updating neurons weights and learn factor
-                for(int k=0; k<neurons.size(); k++) {
-                    learnFactor = learnFactorMax*Math.pow(learnFactorMin/learnFactorMax,i/epochsCounter);
+                for (int k = 0; k < neurons.size(); k++) {
+                    learnFactor = learnFactorMax * Math.pow(learnFactorMin / learnFactorMax, i / eras);
                     double[] weights = neurons.get(k).getWeights();
-                    for(int l=0; l<weights.length; l++) {
-                        weights[l] = weights[l] + (learnFactor * Math.exp((double)-k/lambda) * (learnPattern.get(j).getWeights()[l] - neurons.get(k).getWeights()[l]));
+                    for (int l = 0; l < weights.length; l++) {
+                        weights[l] = weights[l] + (learnFactor * Math.exp((double) -k / lambda) * (aLearnPattern.getWeights()[l] - neurons.get(k).getWeights()[l]));
                     }
                     neurons.get(k).setWeights(weights);
                 }
