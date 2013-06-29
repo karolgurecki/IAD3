@@ -7,6 +7,42 @@
     <groupId>IAD3</groupId>
     <artifactId>IAD3</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <developers>
+        <developer>
+            <id>karolgurecki</id>
+            <email>karolgurecki@gmail.com</email>
+            <name>Karol Górecki</name>
+        </developer>
+    </developers>
 
-    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.7</jdk.version>
+        <log4j.version>1.2.17</log4j.version>
+        <slf4j-log4j12.version>1.7.5</slf4j-log4j12.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jcommon</artifactId>
+            <version>1.0.17</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j-log4j12.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+    <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.0.14</version>
+    </dependency>
 </project>
