@@ -1,4 +1,4 @@
 IAD3
 ====
 
-Implementation of RBF Neural Netwwork
+Implementation of RBF Neural Network
