@@ -3,13 +3,7 @@ package org.karolgurecki.som;
 import org.karolgurecki.perceptron.funkcje.IdentityFunction;
 import org.karolgurecki.rbf.Neuron;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,23 +12,19 @@ import java.util.List;
  * Time: 18:27
  * To change this template use File | Settings | File Templates.
  */
-public class Kohonen implements SOM{
+public class Kohonen extends SOM{
 
-    private List<Neuron> neurons = new ArrayList<Neuron>();
-    private List<Neuron> pattern = new ArrayList<Neuron>();
+   ;
 
-    private int neuronCounter = 100;
-    private double lambda = 0.05;
-    private double learnFactor = 0.4;
-    private double epochsCounter = 20;
-
-    public Kohonen(int neuronCounter) throws IOException {
+    public Kohonen(int neuronCounter) {
         this.neuronCounter = neuronCounter;
+        lambda = 0.05;
+        learnFactor = 0.4
     }
 
-    private void initNeurons(int counter, int size) {
+    protected void initNeurons(int size) {
         double []weights = new double[size];
-        for (int i = 0; i < counter; i++) {
+        for (int i = 0; i < neuronCounter; i++) {
             for(int j=0;j<size;j++) {
                 weights[j] = Math.random();
             }
@@ -42,18 +32,17 @@ public class Kohonen implements SOM{
         }
     }
 
-    public void teach(int epochs) {
-        this.epochsCounter = epochs;
-        initNeurons(neuronCounter,pattern.get(0).getWeights().length);
+    public void teach(int eras) {
+        initNeurons(learnPattern.get(0).getWeights().length);
         double distance = 0;
-        for(int i=0; i<epochsCounter; i++) {
-            for(int j=0; j<pattern.size(); j++) {
-                Collections.sort(neurons, new NeuronComparator(pattern.get(j)));
+        for(int i=0; i<eras; i++) {
+            for(int j=0; j< learnPattern.size(); j++) {
+                Collections.sort(neurons, new NeuronComparator(learnPattern.get(j)));
                 //updating winner
-                distance = NeuronComparator.countDistance(neurons.get(0),pattern.get(j));
+                distance = NeuronComparator.countDistance(neurons.get(0), learnPattern.get(j));
                 double[] weights = neurons.get(0).getWeights();
                 for(int l=0; l<weights.length; l++) {
-                    weights[l] = weights[l] + (learnFactor * Math.exp(-(distance*distance)/(2.0*lambda*lambda)) * (pattern.get(j).getWeights()[l] - neurons.get(0).getWeights()[l]));
+                    weights[l] = weights[l] + (learnFactor * Math.exp(-(distance*distance)/(2.0*lambda*lambda)) * (learnPattern.get(j).getWeights()[l] - neurons.get(0).getWeights()[l]));
                 }
                 neurons.get(0).setWeights(weights);
                 //updating neighbourhood
@@ -61,23 +50,10 @@ public class Kohonen implements SOM{
                     //counting distance between winner and another neurons
                     distance = NeuronComparator.countDistance(neurons.get(k),neurons.get(0));
                     for(int l=0; l<weights.length; l++) {
-                        weights[l] = weights[l] + (learnFactor * Math.exp(-(distance*distance)/(2.0*lambda*lambda)) * (pattern.get(j).getWeights()[l] - neurons.get(k).getWeights()[l]));
+                        weights[l] = weights[l] + (learnFactor * Math.exp(-(distance*distance)/(2.0*lambda*lambda)) * (learnPattern.get(j).getWeights()[l] - neurons.get(k).getWeights()[l]));
                     }
                 }
             }
         }
     }
-
-    public void plot() {
-        Plot.plot("Kohonen", neurons, pattern);
-    }
-
-    public List<Neuron> getNeurons() {
-        return neurons;
-    }
-
-    public void setPattern(List<Neuron> pattern) {
-        this.pattern = pattern;
-    }
-
 }
