@@ -79,8 +79,7 @@ private double[] coordinates;
         int length = Math.min(point.coordinates.length, coordinates.length);
         double ret = .0;
         for (int i = 0; i < length; i++)
-            ret += (point.getCoordinate(i) - coordinates[i])
-                    * (point.getCoordinate(i) - coordinates[i]);
+            ret += Math.pow(point.getCoordinate(i) - coordinates[i],2);
         return Math.sqrt(ret);
     }
 
