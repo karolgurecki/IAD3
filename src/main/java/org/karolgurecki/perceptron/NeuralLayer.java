@@ -1,6 +1,7 @@
-package org.karolgurecki.perceptron.funkcje;
+package org.karolgurecki.perceptron;
 
 import org.apache.log4j.Logger;
+import org.karolgurecki.perceptron.funkcje.Function;
 import org.karolgurecki.rbf.Neuron;
 
 import java.util.ArrayList;

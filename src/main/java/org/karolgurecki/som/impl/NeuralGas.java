@@ -1,7 +1,9 @@
-package org.karolgurecki.som;
+package org.karolgurecki.som.impl;
 
 import org.karolgurecki.perceptron.funkcje.IdentityFunction;
 import org.karolgurecki.rbf.Neuron;
+import org.karolgurecki.som.NeuronComparator;
+import org.karolgurecki.som.SOM;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -14,7 +16,7 @@ import java.util.List;
  * Time: 21:11
  * To change this template use File | Settings | File Templates.
  */
-public class NeuralGas extends SOM{
+public class NeuralGas extends SOM {
     private double lambdaMax;
     private double lambdaMin = 0.01;
     private double learnFactorMax = 0.4;

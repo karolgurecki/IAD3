@@ -1,7 +1,9 @@
-package org.karolgurecki.som;
+package org.karolgurecki.som.impl;
 
 import org.karolgurecki.perceptron.funkcje.IdentityFunction;
 import org.karolgurecki.rbf.Neuron;
+import org.karolgurecki.som.NeuronComparator;
+import org.karolgurecki.som.SOM;
 
 import java.util.Collections;
 
@@ -12,7 +14,7 @@ import java.util.Collections;
  * Time: 18:27
  * To change this template use File | Settings | File Templates.
  */
-public class Kohonen extends SOM{
+public class Kohonen extends SOM {
 
    ;
 
