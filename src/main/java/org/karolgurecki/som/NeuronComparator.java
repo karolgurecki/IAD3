@@ -15,7 +15,7 @@ public class NeuronComparator implements Comparator<Neuron> {
 
     Neuron patternNeuron = null;
 
-    NeuronComparator(Neuron patternNeuron) {
+   public NeuronComparator(Neuron patternNeuron) {
         this.patternNeuron = patternNeuron;
     }
 
