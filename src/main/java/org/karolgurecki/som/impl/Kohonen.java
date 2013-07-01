@@ -20,8 +20,8 @@ public class Kohonen extends SOM {
 
     public Kohonen(int neuronCounter) {
         this.neuronCounter = neuronCounter;
-        lambda = 0.05;
-        learnFactor = 0.4;
+        lambda = 0.5;
+        learnFactor = 0.5;
     }
 
     protected void initNeurons(int size) {

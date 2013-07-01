@@ -18,9 +18,9 @@ import java.util.List;
  */
 public class NeuralGas extends SOM {
     private double lambdaMax;
-    private double lambdaMin = 0.01;
-    private double learnFactorMax = 0.4;
-    private double learnFactorMin = 0.003;
+    private double lambdaMin = 0.001;
+    private double learnFactorMax = 0.5;
+    private double learnFactorMin = 0.001;
 
     public List<Neuron> getNeurons() {
         return neurons;

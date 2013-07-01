@@ -1,12 +1,7 @@
 package org.karolgurecki.rbf;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartFrame;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.karolgurecki.perceptron.NeuralLayer;
 import org.karolgurecki.perceptron.NeuralNetwork;
 import org.karolgurecki.perceptron.funkcje.IdentityFunction;
@@ -15,9 +10,7 @@ import org.karolgurecki.som.SOM;
 import org.karolgurecki.som.impl.Kohonen;
 import org.karolgurecki.som.impl.NeuralGas;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -184,29 +177,51 @@ public class RBFMain {
                 network.teach();
             }
         }
+        double error=0;
+            for (int h = 0; h < network.getOutput().length; h++)
+                error += Math.pow(network.getOutput()[h] - out.get(out.size()-1).getWeights()[h], 2);
 
         readApproxData(false, approxTestFile, in);
         readApproxData(true, approxTestFile, out);
-
+        error/=network.getOutput().length;
         // test
 
         XYSeries series = new XYSeries("Line");
+        List<double[]> points = new ArrayList<>();
         for (int i = 0; i < in.size(); i++) {
             network.initSignals(getResults(new Point(in.get(i).getWeights()),
                     neurons));
             network.setExpectedOutput(new double[]{out.get(i).getWeights()[0]});
 
             series.add(in.get(i).getWeights()[0], network.getOutput()[0]);
+            points.add(new double[]{in.get(i).getWeights()[0], network.getOutput()[0]});
         }
-
-        XYSeriesCollection data = new XYSeriesCollection();
-        data.addSeries(series);
-        JFreeChart chart = ChartFactory.createXYLineChart(chartTitle, "x",
-                "y", data, PlotOrientation.VERTICAL, true, true, false);
-
-        ChartFrame frame1 = new ChartFrame("XYArea Chart", chart);
-        frame1.setVisible(true);
-        frame1.setSize(500, 400);
+//
+//        XYSeriesCollection data = new XYSeriesCollection();
+//        data.addSeries(series);
+//        JFreeChart chart = ChartFactory.createXYLineChart(chartTitle, "x",
+//                "y", data, PlotOrientation.VERTICAL, true, true, false);
+//
+//        ChartFrame frame1 = new ChartFrame("XYArea Chart", chart);
+//        frame1.setVisible(true);
+//        frame1.setSize(500, 400);
+        StringBuilder builder = new StringBuilder();
+        // double[][] points = series.toArray();
+        for (int i = 0; i < points.size(); i++) {
+            for (int j = 0; j < points.get(i).length; j++)
+                builder.append(points.get(i)[j] + " ");
+            builder.append("\n");
+        }
+        try {
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter("wyniki" + File.separator + chartTitle + " " +
+                    som.getNeuronCounter() + " neurons split " + networkAlpha + " " + networkMomentum + " error "+error+".txt"
+            ));
+            outputWriter.write(builder.toString());
+            outputWriter.close();
+        } catch (IOException e) {
+        }
+        LOGGER.info(chartTitle + " " +
+                som.getNeuronCounter() + " neurons split " + networkAlpha + " " + networkMomentum +" error "+error+ " done");
     }
 
     public static void approxTogether(SOM som, double networkAlpha,
@@ -269,28 +284,51 @@ public class RBFMain {
             }
         }
 
+        double error=0;
+        for (int h = 0; h < network.getOutput().length; h++)
+            error += Math.pow(network.getOutput()[h] - out.get(out.size()-1).getWeights()[h], 2);
+        error/=network.getOutput().length;
         readApproxData(false, approxTestFile, in);
         readApproxData(true, approxTestFile, out);
 
         // test
 
         XYSeries series = new XYSeries("Line");
+        List<double[]> points = new ArrayList<>();
         for (int i = 0; i < in.size(); i++) {
             network.initSignals(getResults(new Point(in.get(i).getWeights()),
                     neurons));
             network.setExpectedOutput(new double[]{out.get(i).getWeights()[0]});
 
             series.add(in.get(i).getWeights()[0], network.getOutput()[0]);
+            points.add(new double[]{in.get(i).getWeights()[0], network.getOutput()[0]});
         }
-
-        XYSeriesCollection data = new XYSeriesCollection();
-        data.addSeries(series);
-        JFreeChart chart = ChartFactory.createXYLineChart(chartTitle, "x",
-                "y", data, PlotOrientation.VERTICAL, true, true, false);
-
-        ChartFrame frame1 = new ChartFrame("XYArea Chart", chart);
-        frame1.setVisible(true);
-        frame1.setSize(500, 400);
+//
+//        XYSeriesCollection data = new XYSeriesCollection();
+//        data.addSeries(series);
+//        JFreeChart chart = ChartFactory.createXYLineChart(chartTitle, "x",
+//                "y", data, PlotOrientation.VERTICAL, true, true, false);
+//
+//        ChartFrame frame1 = new ChartFrame("XYArea Chart", chart);
+//        frame1.setVisible(true);
+//        frame1.setSize(500, 400);
+        StringBuilder builder = new StringBuilder();
+        // double[][] points = series.toArray();
+        for (int i = 0; i < points.size(); i++) {
+            for (int j = 0; j < points.get(i).length; j++)
+                builder.append(points.get(i)[j] + " ");
+            builder.append("\n");
+        }
+        try {
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter("wyniki" + File.separator + chartTitle + " " +
+                    som.getNeuronCounter() + " neurons together " + networkAlpha + " " + networkMomentum + " error "+error+".txt"
+            ));
+            outputWriter.write(builder.toString());
+            outputWriter.close();
+        } catch (IOException e) {
+        }
+        LOGGER.info(chartTitle + " " +
+                som.getNeuronCounter() + " neurons together " + networkAlpha + " " + networkMomentum +" error "+error+ " done");
     }
 
     public static void classifySplit(SOM som, double networkAlpha,
@@ -301,8 +339,6 @@ public class RBFMain {
         List<Neuron> out = new ArrayList<Neuron>();
 
         readClassifyData(classificationTrainFile, in, out, inputs);
-        LOGGER.info(Arrays.toString(in.toArray()));
-        LOGGER.info(Arrays.toString(out.toArray()));
         som.setLearnPattern(in);
         som.teach(100);
 
@@ -351,7 +387,10 @@ public class RBFMain {
                 network.teach();
             }
         }
-
+        double error=0;
+        for (int h = 0; h < network.getOutput().length; h++)
+            error += Math.pow(network.getOutput()[h] - out.get(out.size()-1).getWeights()[h], 2);
+        error/=network.getOutput().length;
         readClassifyData(classificationTestFile, in, out, inputs);
 
         // test
@@ -370,8 +409,8 @@ public class RBFMain {
             if (out.get(i).getWeights()[maxIndex] == 1.0) properlyInCount++;
         }
         double result = ((double) properlyInCount / (double) in.size()) * 100.0;
-        LOGGER.info(String.format("Percentage properly classify inputs for teaching on %s = %f",
-                Arrays.toString(inputs), result));
+        LOGGER.info(String.format("Percentage properly classify inputs for split teaching %d neurons on %s = %f. Error = %f", som.getNeuronCounter(),
+                Arrays.toString(inputs), result,error));
 
 
     }
@@ -434,7 +473,10 @@ public class RBFMain {
                 network.teach();
             }
         }
-
+        double error=0;
+        for (int h = 0; h < network.getOutput().length; h++)
+            error += Math.pow(network.getOutput()[h] - out.get(out.size()-1).getWeights()[h], 2);
+        error/=network.getOutput().length;
         readClassifyData(classificationTestFile, in, out, inputs);
 
         // test
@@ -448,54 +490,75 @@ public class RBFMain {
             testOut = network.getOutput();
             int maxIndex = 0;
             for (int j = 0; j < testOut.length; j++) {
-                if (testOut[j] > testOut[maxIndex]) maxIndex = i;
+                if (testOut[j] > testOut[maxIndex]) maxIndex = j;
             }
             if (out.get(i).getWeights()[maxIndex] == 1.0) properlyInCount++;
         }
         double result = ((double) properlyInCount / (double) in.size()) * 100.0;
-        LOGGER.info(String.format("Percentage properly classify inputs for teaching on %s = %f",
-                Arrays.toString(inputs), result));
+        LOGGER.info(String.format("Percentage properly classify inputs for teaching together %d neurons on %s = %f. Error = %f", som.getNeuronCounter(),
+                Arrays.toString(inputs), result,error));
 
     }
 
     public static void main(String[] args) throws IOException {
+        String[][] str = {{"src/main/resources/aprox-train-small.dat", " - file small"}, {"src/main/resources/aprox-train-big.dat", " - file big"}};
+        int[] numberOfNeurons = {5,10, 15};
+        int[][] numberOfIn = {{0, 1, 2, 3}, {0, 1, 2}, {1, 2, 3},
+                {0, 2, 3}, {0, 1, 3}, {0, 1}, {0, 2}, {0, 3},
+                {1, 2}, {1, 3}, {2, 3}, {0}, {1}, {2}, {3}};
+        for (int i = 0; i < numberOfNeurons.length; i++) {
+            for (int j = 0; j < str.length; j++) {
+                // Kohonen - file small - together
+                approxTogether(new Kohonen(numberOfNeurons[i]), 0.001, 0.1,
+                        str[j][0],
+                        "src/main/resources/aprox-test.dat",
+                        "Kohonen" + str[j][1]);
 
-        // Kohonen - file small - together
-        approxTogether(new Kohonen(3), 0.001, 0.1,
-                "src/main/resources/aprox-train-small.dat",
-                "src/main/resources/aprox-test.dat",
-                "Kohonen - file small");
 
+                // NeuralGas - file small - together
+                approxTogether(new NeuralGas(numberOfNeurons[i]), 0.01, 0.1,
+                        str[j][0],
+                        "src/main/resources/aprox-test.dat",
+                        "NeuralGas" + str[j][1]);
 
-        // NeuralGas - file small - together
-        approxTogether(new NeuralGas(3), 0.01, 0.1,
-                "src/main/resources/aprox-train-small.dat",
-                "src/main/resources/aprox-test.dat",
-                "Neural Gas - file small");
+                // Kohonen - file small - split
+                approxSplit(new Kohonen(numberOfNeurons[i]), 0.001, 0.1,
+                        str[j][0],
+                        "src/main/resources/aprox-test.dat",
+                        "Kohonen" + str[j][1]);
 
-        // Kohonen - file small - split
-        approxSplit(new Kohonen(2), 0.001, 0.1,
-                "src/main/resources/aprox-train-small.dat",
-                "src/main/resources/aprox-test.dat",
-                "Kohonen - file small");
+                // Neural gas - file small - split
+                approxSplit(new NeuralGas(numberOfNeurons[i]), 0.001, 0.1,
+                        str[j][0],
+                        "src/main/resources/aprox-test.dat",
+                        "NeuralGas" + str[j][1]);
+            }
+        }
+        numberOfNeurons = new int[]{ 2, 3, 5};
+        for (int i = 0; i < numberOfNeurons.length; i++) {
+            for (int k = 0; k < numberOfIn.length; k++) {
+                // Kohonen - file small - together
+                classifySplit(new Kohonen(numberOfNeurons[i]), 0.001, 0.1,
+                        "src/main/resources/c-train.dat",
+                        "src/main/resources/c-test.dat",
+                        numberOfIn[k]);
 
-        // Neural gas - file small - split
-        approxSplit(new NeuralGas(2), 0.001, 0.1,
-                "src/main/resources/aprox-train-small.dat",
-                "src/main/resources/aprox-test.dat",
-                "NeuralGas - file small");
+                classifyTogether(new Kohonen(numberOfNeurons[i]), 0.001, 0.1,
+                        "src/main/resources/c-train.dat",
+                        "src/main/resources/c-test.dat",
+                        numberOfIn[k]);
+                LOGGER.info("NeuralGas");
+                classifySplit(new NeuralGas(numberOfNeurons[i]), 0.001, 0.1,
+                        "src/main/resources/c-train.dat",
+                        "src/main/resources/c-test.dat",
+                        numberOfIn[k]);
 
-        // Kohonen - file small - together
-        classifySplit(new Kohonen(3), 0.1, 0.1,
-                "src/main/resources/c-train.dat",
-                "src/main/resources/c-test.dat",
-                new int[]{1, 3});
-
-        classifyTogether(new Kohonen(3), 0.1, 0.1,
-                "src/main/resources/c-train.dat",
-                "src/main/resources/c-test.dat",
-                new int[]{1, 3});
-
+                classifyTogether(new NeuralGas(numberOfNeurons[i]), 0.001, 0.1,
+                        "src/main/resources/c-train.dat",
+                        "src/main/resources/c-test.dat",
+                        numberOfIn[k]);
+            }
+        }
 /* ============================================================= */
 
     }
