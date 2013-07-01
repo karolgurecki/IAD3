@@ -9,7 +9,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.karolgurecki.perceptron.NeuralLayer;
 import org.karolgurecki.perceptron.NeuralNetwork;
-import org.karolgurecki.perceptron.funkcje.Function;
 import org.karolgurecki.perceptron.funkcje.IdentityFunction;
 import org.karolgurecki.perceptron.funkcje.LinearFunction;
 import org.karolgurecki.som.SOM;
@@ -17,7 +16,6 @@ import org.karolgurecki.som.impl.Kohonen;
 import org.karolgurecki.som.impl.NeuralGas;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,9 +31,10 @@ import java.util.Random;
  * To change this template use File | Settings | File Templates.
  */
 public class RBFMain {
-    private final static Logger LOGGER=Logger.getLogger(RBFMain.class);
-    private static void readData(boolean col, String filePath,
-                                 List<Neuron> tab) {
+    private final static Logger LOGGER = Logger.getLogger(RBFMain.class);
+
+    private static void readApproxData(boolean col, String filePath,
+                                       List<Neuron> tab) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line = reader.readLine();
@@ -52,40 +51,40 @@ public class RBFMain {
                 line = reader.readLine();
             }
             reader.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void print(double[] tab) {
-        LOGGER.info(Arrays.toString(tab)+"\n");
-    }
-
-    public static NeuralNetwork networkBuilder(int layersCount,
-                                               int[] neuronsCount, int[] inputsCount, Function[] activateFunctions) {
-
-        NeuralNetwork network = new NeuralNetwork();
-
-        NeuralLayer[] layers = new NeuralLayer[layersCount];
-        for (int i = 0; i < layersCount; i++) {
-            layers[i] = new NeuralLayer(neuronsCount[i], inputsCount[i]);
-            if (activateFunctions.length != 1)
-                layers[i].setActivateFunction(activateFunctions[i]);
+    private static void readClassifyData(String filePath, List<Neuron> in, List<Neuron> out, int[] inputs) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            String line = reader.readLine();
+            double[] weights;
+            while (line != null) {
+                weights = new double[inputs.length];
+                String[] entry = line.split(" ");
+                for (int i = 0; i < inputs.length; i++) {
+                    weights[i] = Double.parseDouble(entry[inputs[i]]);
+                }
+                in.add(new Neuron(new IdentityFunction(), weights.clone()));
+                switch (Integer.parseInt(entry[entry.length - 1])) {
+                    case 1:
+                        out.add(new Neuron(new IdentityFunction(), 1.0, .0, .0));
+                        break;
+                    case 2:
+                        out.add(new Neuron(new IdentityFunction(), .0, 1.0, .0));
+                        break;
+                    case 3:
+                        out.add(new Neuron(new IdentityFunction(), .0, .0, 1.0));
+                        break;
+                }
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        for (int i = 0; i < layersCount - 1; i++) {
-            layers[i].setNextLayer(layers[i + 1]);
-            network.addLayer(layers[i]);
-        }
-
-        network.addLayer(layers[layers.length - 1]);
-
-        if (activateFunctions.length == 1)
-            network.setActivateFunction(activateFunctions[0]);
-
-        return network;
     }
 
     private static double getNearestDist(int i, List<RBFNeuron> neurons) {
@@ -111,7 +110,7 @@ public class RBFMain {
     }
 
     private static List<RBFNeuron> toRBFNeurons(List<Neuron> neurons) {
-        List<RBFNeuron> result = new ArrayList<RBFNeuron>();
+        List<RBFNeuron> result = new ArrayList<>();
         for (Neuron n : neurons) {
             result.add(new RBFNeuron(n.getWeights()));
         }
@@ -128,14 +127,14 @@ public class RBFMain {
     }
 
     public static void approxSplit(SOM som, double networkAlpha,
-                                   double networkMomentum, String aproxTrainFile, String aproxTestFile, String chartTitle)
+                                   double networkMomentum, String approxTrainFile, String approxTestFile, String chartTitle)
             throws IOException {
 
-        ArrayList<Neuron> in = new ArrayList<Neuron>();
-        ArrayList<Neuron> out = new ArrayList<Neuron>();
+        ArrayList<Neuron> in = new ArrayList<>();
+        ArrayList<Neuron> out = new ArrayList<>();
 
-        readData(false, aproxTrainFile, in);
-        readData(true, aproxTrainFile, out);
+        readApproxData(false, approxTrainFile, in);
+        readApproxData(true, approxTrainFile, out);
 
         som.setLearnPattern(in);
         som.teach(100);
@@ -186,8 +185,8 @@ public class RBFMain {
             }
         }
 
-        readData(false, aproxTestFile, in);
-        readData(true, aproxTestFile, out);
+        readApproxData(false, approxTestFile, in);
+        readApproxData(true, approxTestFile, out);
 
         // test
 
@@ -195,7 +194,7 @@ public class RBFMain {
         for (int i = 0; i < in.size(); i++) {
             network.initSignals(getResults(new Point(in.get(i).getWeights()),
                     neurons));
-            network.setExpectedOutput(new double[] { out.get(i).getWeights()[0] });
+            network.setExpectedOutput(new double[]{out.get(i).getWeights()[0]});
 
             series.add(in.get(i).getWeights()[0], network.getOutput()[0]);
         }
@@ -211,14 +210,14 @@ public class RBFMain {
     }
 
     public static void approxTogether(SOM som, double networkAlpha,
-                                      double networkMomentum, String aproxTrainFile, String aproxTestFile, String chartTitle)
+                                      double networkMomentum, String approxTrainFile, String approxTestFile, String chartTitle)
             throws IOException {
 
-        List<Neuron> in = new ArrayList<Neuron>();
-        List<Neuron> out = new ArrayList<Neuron>();
+        List<Neuron> in = new ArrayList<>();
+        List<Neuron> out = new ArrayList<>();
 
-        readData(false, aproxTrainFile, in);
-        readData(true, aproxTrainFile, out);
+        readApproxData(false, approxTrainFile, in);
+        readApproxData(true, approxTrainFile, out);
 
         som.setLearnPattern(in);
         som.teach(1);
@@ -270,8 +269,8 @@ public class RBFMain {
             }
         }
 
-        readData(false, aproxTestFile, in);
-        readData(true, aproxTestFile, out);
+        readApproxData(false, approxTestFile, in);
+        readApproxData(true, approxTestFile, out);
 
         // test
 
@@ -279,7 +278,7 @@ public class RBFMain {
         for (int i = 0; i < in.size(); i++) {
             network.initSignals(getResults(new Point(in.get(i).getWeights()),
                     neurons));
-            network.setExpectedOutput(new double[] { out.get(i).getWeights()[0] });
+            network.setExpectedOutput(new double[]{out.get(i).getWeights()[0]});
 
             series.add(in.get(i).getWeights()[0], network.getOutput()[0]);
         }
@@ -294,6 +293,171 @@ public class RBFMain {
         frame1.setSize(500, 400);
     }
 
+    public static void classifySplit(SOM som, double networkAlpha,
+                                     double networkMomentum, String classificationTrainFile, String classificationTestFile, int[] inputs)
+            throws IOException {
+
+        List<Neuron> in = new ArrayList<Neuron>();
+        List<Neuron> out = new ArrayList<Neuron>();
+
+        readClassifyData(classificationTrainFile, in, out, inputs);
+        LOGGER.info(Arrays.toString(in.toArray()));
+        LOGGER.info(Arrays.toString(out.toArray()));
+        som.setLearnPattern(in);
+        som.teach(100);
+
+        // Utworzenie sieci
+        NeuralLayer layer = new NeuralLayer(3, som.getNeurons().size());
+        layer.setActivateFunction(new IdentityFunction());
+        layer.setBiasEnabled(true);
+
+        Neuron.setAlpha(networkAlpha);
+        Neuron.setMomentum(networkMomentum);
+
+        NeuralNetwork network = new NeuralNetwork();
+        network.initWeights(-1d, 1d);
+        network.addLayer(layer);
+
+        // Warstwa z sigma
+
+        List<RBFNeuron> neurons = toRBFNeurons(som.getNeurons());
+        double sigma = countSigma(neurons);
+        for (RBFNeuron n : neurons) {
+            n.setSigma(sigma);
+        }
+
+        // nauka sieci
+
+        int epochs = 10000;
+        int pointCount = in.size();
+        Random rnd = new Random();
+        Point random;
+        boolean[] tab = new boolean[pointCount];
+        int chose;
+
+        for (int i = 0; i < epochs; i++) {
+            Arrays.fill(tab, false);
+            for (int k = 0; k < pointCount; k++) {
+                do {
+                    chose = rnd.nextInt(pointCount);
+                } while (tab[chose]);
+                tab[chose] = true;
+                random = new Point(in.get(chose).getWeights());
+
+                network.setExpectedOutput(out.get(chose).getWeights());
+                network.initSignals(getResults(random, neurons));
+
+                network.getOutput();
+                network.teach();
+            }
+        }
+
+        readClassifyData(classificationTestFile, in, out, inputs);
+
+        // test
+
+        double[] testOut;
+        int properlyInCount = 0;
+        for (int i = 0; i < in.size(); i++) {
+            network.initSignals(getResults(new Point(in.get(i).getWeights()),
+                    neurons));
+            network.setExpectedOutput(out.get(i).getWeights());
+            testOut = network.getOutput();
+            int maxIndex = 0;
+            for (int j = 0; j < testOut.length; j++) {
+                if (testOut[j] > testOut[maxIndex]) maxIndex = j;
+            }
+            if (out.get(i).getWeights()[maxIndex] == 1.0) properlyInCount++;
+        }
+        double result = ((double) properlyInCount / (double) in.size()) * 100.0;
+        LOGGER.info(String.format("Percentage properly classify inputs for teaching on %s = %f",
+                Arrays.toString(inputs), result));
+
+
+    }
+
+    public static void classifyTogether(SOM som, double networkAlpha,
+                                        double networkMomentum, String classificationTrainFile, String classificationTestFile, int[] inputs)
+            throws IOException {
+
+        List<Neuron> in = new ArrayList<Neuron>();
+        List<Neuron> out = new ArrayList<Neuron>();
+
+        readClassifyData(classificationTrainFile, in, out, inputs);
+
+        som.setLearnPattern(in);
+        som.teach(1);
+
+        // Utworzenie sieci
+        NeuralLayer layer = new NeuralLayer(3, som.getNeurons().size());
+        layer.setActivateFunction(new LinearFunction(1d, 0d));
+        layer.setBiasEnabled(true);
+
+        Neuron.setAlpha(networkAlpha);
+        Neuron.setMomentum(networkMomentum);
+
+        NeuralNetwork network = new NeuralNetwork();
+        network.initWeights(-1d, 1d);
+        network.addLayer(layer);
+
+        // Warstwa z sigma
+
+        List<RBFNeuron> neurons = toRBFNeurons(som.getNeurons());
+        double sigma = countSigma(neurons);
+        for (RBFNeuron n : neurons) {
+            n.setSigma(sigma);
+        }
+
+        // nauka sieci
+
+        int epochs = 1000;
+        int pointCount = in.size();
+        Random rnd = new Random();
+        Point random;
+        boolean[] tab = new boolean[pointCount];
+        int chose;
+
+        for (int i = 0; i < epochs; i++) {
+            som.teach(1);
+            Arrays.fill(tab, false);
+            for (int k = 0; k < pointCount; k++) {
+                do {
+                    chose = rnd.nextInt(pointCount);
+                } while (tab[chose]);
+                tab[chose] = true;
+                random = new Point(in.get(chose).getWeights());
+
+                network.setExpectedOutput(out.get(chose).getWeights());
+                network.initSignals(getResults(random, neurons));
+
+                network.getOutput();
+                network.teach();
+            }
+        }
+
+        readClassifyData(classificationTestFile, in, out, inputs);
+
+        // test
+
+        double[] testOut;
+        int properlyInCount = 0;
+        for (int i = 0; i < in.size(); i++) {
+            network.initSignals(getResults(new Point(in.get(i).getWeights()),
+                    neurons));
+            network.setExpectedOutput(out.get(i).getWeights());
+            testOut = network.getOutput();
+            int maxIndex = 0;
+            for (int j = 0; j < testOut.length; j++) {
+                if (testOut[j] > testOut[maxIndex]) maxIndex = i;
+            }
+            if (out.get(i).getWeights()[maxIndex] == 1.0) properlyInCount++;
+        }
+        double result = ((double) properlyInCount / (double) in.size()) * 100.0;
+        LOGGER.info(String.format("Percentage properly classify inputs for teaching on %s = %f",
+                Arrays.toString(inputs), result));
+
+    }
+
     public static void main(String[] args) throws IOException {
 
         // Kohonen - file small - together
@@ -302,17 +466,6 @@ public class RBFMain {
                 "src/main/resources/aprox-test.dat",
                 "Kohonen - file small");
 
-        // Kohonen - file big - together
-        approxTogether(new Kohonen(2), 0.01, 0.1,
-                "src/main/resources/aprox-train-big.dat",
-                "src/main/resources/aprox-test.dat",
-                "Kohonen - file big");
-
-        // NeuralGas - file big - together
-        approxTogether(new NeuralGas(3), 0.01, 0.1,
-                "src/main/resources/aprox-train-big.dat",
-                "src/main/resources/aprox-test.dat",
-                "Neural Gas - file big");
 
         // NeuralGas - file small - together
         approxTogether(new NeuralGas(3), 0.01, 0.1,
@@ -326,24 +479,22 @@ public class RBFMain {
                 "src/main/resources/aprox-test.dat",
                 "Kohonen - file small");
 
-        // Kohonen - file big - split
-        approxSplit(new Kohonen(4), 0.001, 0.1,
-                "src/main/resources/aprox-train-big.dat",
-                "src/main/resources/aprox-test.dat",
-                "Kohonen - file big");
-
-        // Neural gas - file big - split
-        approxSplit(new NeuralGas(2), 0.001, 0.1,
-                "src/main/resources/aprox-train-big.dat",
-                "src/main/resources/aprox-test.dat",
-                "NeuralGas - file big");
-
         // Neural gas - file small - split
         approxSplit(new NeuralGas(2), 0.001, 0.1,
                 "src/main/resources/aprox-train-small.dat",
                 "src/main/resources/aprox-test.dat",
                 "NeuralGas - file small");
 
+        // Kohonen - file small - together
+        classifySplit(new Kohonen(3), 0.1, 0.1,
+                "src/main/resources/c-train.dat",
+                "src/main/resources/c-test.dat",
+                new int[]{1, 3});
+
+        classifyTogether(new Kohonen(3), 0.1, 0.1,
+                "src/main/resources/c-train.dat",
+                "src/main/resources/c-test.dat",
+                new int[]{1, 3});
 
 /* ============================================================= */
 

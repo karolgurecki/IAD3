@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class NeuralNetwork {
     private static final Logger LOGGER = Logger.getLogger(NeuralNetwork.class.getSimpleName());
-    private List<NeuralLayer> layers = new ArrayList<NeuralLayer>();
+    private List<NeuralLayer> layers = new ArrayList<>();
     private double[] expectedOutput;
 
     public NeuralNetwork() {
@@ -23,61 +23,41 @@ public class NeuralNetwork {
     }
 
     public void setExpectedOutput(double[] expOut) {
-        LOGGER.debug("Setting expected output");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Setting expected output");
 
         this.expectedOutput = expOut.clone();
     }
 
-    public double[] getExpectedOutput() {
-        return expectedOutput;
-    }
 
     public void addLayer(NeuralLayer layer) {
         layers.add(layer);
     }
 
-    public void setLayers(List<NeuralLayer> layers) {
-        this.layers.addAll(layers);
-    }
-
-    public List<NeuralLayer> getLayers() {
-        return layers;
-    }
 
     public void initWeights(double lowerBound, double upperBound) {
-        LOGGER.debug("Initializing network weights");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Initializing network weights");
 
         int i = 1;
         for (NeuralLayer layer : layers) {
+            if (LOGGER.isDebugEnabled())
             LOGGER.debug("Layer " + (i++));
             layer.initWeights(lowerBound, upperBound);
         }
     }
 
     public void initSignals(double[] signals) {
-        LOGGER.debug("Initializing network signals");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Initializing network signals");
 
         layers.get(0).initSignals(signals);
     }
 
-    public void setBiasEnabled(boolean bool) {
-        LOGGER.debug("Setting bias: " + bool);
-
-        for (NeuralLayer layer : layers) {
-            layer.setBiasEnabled(bool);
-        }
-    }
-
-    public void setActivateFunction(Function function) {
-        LOGGER.debug("Setting activate function: " + function);
-
-        for (NeuralLayer layer : layers) {
-            layer.setActivateFunction(function);
-        }
-    }
 
     public double[] getOutput() {
-        LOGGER.debug("Counting network output.");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Counting network output.");
 
         for (int i = 0; i < layers.size() - 1; i++) {
             double[] layerOut = layers.get(i).output();

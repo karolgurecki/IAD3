@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class NeuralLayer {
     private static final Logger LOGGER = Logger.getLogger(NeuralLayer.class.getSimpleName());
-    private List<Neuron> neurons = new ArrayList<Neuron>();
+    private List<Neuron> neurons = new ArrayList<>();
     private NeuralLayer nextLayer;
     private boolean bias = false;
 
@@ -25,22 +25,6 @@ public class NeuralLayer {
         for (int i = 0; i < neuronsCount; i++) {
             neurons.add(0, new Neuron(inputSize));
         }
-    }
-
-    public void setNextLayer(NeuralLayer layer) {
-        this.nextLayer = layer;
-    }
-
-    public NeuralLayer getNextLayer() {
-        return nextLayer;
-    }
-
-    public void addNeuron(Neuron neuron) {
-        neurons.add(neuron);
-    }
-
-    public void addNeurons(List<Neuron> neurons) {
-        this.neurons.addAll(neurons);
     }
 
     public void setActivateFunction(Function function) {
@@ -52,6 +36,7 @@ public class NeuralLayer {
     public void initWeights(double lowerBound, double upperBound) {
         int i = 1;
         for (Neuron neuron : neurons) {
+            if(LOGGER.isDebugEnabled())
             LOGGER.debug("Neuron " + (i++));
             neuron.initWeights(lowerBound, upperBound);
         }

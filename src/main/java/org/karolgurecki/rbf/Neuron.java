@@ -3,12 +3,12 @@ package org.karolgurecki.rbf;
 import org.apache.log4j.Logger;
 import org.karolgurecki.perceptron.funkcje.Function;
 
+import java.util.Arrays;
 import java.util.Random;
 
 
 public class Neuron {
-    private static final String CLASSNAME = Neuron.class.getName();
-    private static final Logger LOGGER = Logger.getLogger(CLASSNAME);
+    private static final Logger LOGGER = Logger.getLogger(Neuron.class);
 
     private static double ALPHA = 0.1;
     private static double MOMENTUM = 0.9;
@@ -29,13 +29,13 @@ public class Neuron {
         this.weights = weights;
     }
 
-    public Neuron(int inputSize, Function function) {
-
-        weights = new double[inputSize];
-        signals = new double[inputSize];
-        activateFunction = function;
-
-    }
+//    public Neuron(int inputSize, Function function) {
+//
+//        weights = new double[inputSize];
+//        signals = new double[inputSize];
+//        activateFunction = function;
+//
+//    }
 
     public double getResult() {
         return out;
@@ -84,8 +84,12 @@ public class Neuron {
         return weights;
     }
 
-    public double[] getSignals() {
-        return signals;
+
+    @Override
+    public String toString() {
+        return "Neuron{" +
+                "weights=" + Arrays.toString(weights) +
+                '}';
     }
 
     public void initWeights(double lowerBound, double upperBound) {
@@ -94,7 +98,8 @@ public class Neuron {
         for (int i = 0; i < weights.length; i++) {
             weights[i] = lowerBound + (upperBound - lowerBound)
                     * random.nextDouble();
-            LOGGER.info("Weight: " + weights[i]);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Weight: " + weights[i]);
         }
     }
 
@@ -108,7 +113,8 @@ public class Neuron {
         }
 
         for (int i = 0; i < signals.length; i++) {
-            LOGGER.info("Signal " + i + ": " + signals[i]);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Signal " + i + ": " + signals[i]);
         }
     }
 
