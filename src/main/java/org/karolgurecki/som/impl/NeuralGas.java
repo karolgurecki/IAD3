@@ -17,10 +17,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class NeuralGas extends SOM {
-    private double lambdaMax;
-    private double lambdaMin = 0.001;
-    private double learnFactorMax = 0.5;
-    private double learnFactorMin = 0.001;
+
 
     public List<Neuron> getNeurons() {
         return neurons;

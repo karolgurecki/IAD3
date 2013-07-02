@@ -23,6 +23,7 @@ public class Neuron {
     public Neuron(Function function, double... weights) {
         this.weights = weights;
         this.activateFunction = function;
+        //LOGGER.info(Arrays.toString(weights));
     }
 
     public void setWeights(double[] weights) {
